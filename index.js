@@ -7,7 +7,7 @@ const cors = require('cors');
 const expressValidator = require('express-validator')
 
 const dotenv = require('dotenv')
-if (process.env.NODE_ENV === "development") dotenv.config();
+dotenv.config();
 
 const mongoose = require('mongoose');
 
@@ -18,6 +18,7 @@ const categoryRoutes = require('./routes/category')
 const productRoutes = require('./routes/product')
 const paymentRoutes = require('./routes/braintree')
 const orderRoutes = require('./routes/order')
+const formRoutes = require('./routes/form')
 
 // APP
 const app = express();
@@ -30,19 +31,9 @@ app.use(cookieParser())
 app.use(expressValidator())
 app.use(cors())
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'client/build')));
-
-    app.get('*', function (req, res) {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-    });
-}
-
 // Database Configuration
 mongoose.connect(`${process.env.DATABASE}`, {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
     useUnifiedTopology: true,
 }).then(() => console.log('Database Connected.'))
 mongoose.connection.on('error', err => {
@@ -56,6 +47,7 @@ app.use('/api', categoryRoutes);
 app.use('/api', productRoutes);
 app.use('/api', paymentRoutes);
 app.use('/api', orderRoutes)
+app.use('/api', formRoutes)
 
 app.get('/', (req, res) => {
     res.json({message: 'You just hit the End Point'});
